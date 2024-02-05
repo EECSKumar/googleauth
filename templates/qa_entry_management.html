@@ -1,0 +1,40 @@
+<!-- templates/qa_entry_management.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Add your meta tags, title, and stylesheet link here -->
+</head>
+<body>
+    <div class="qa-container">
+        <h2>QA Entry Management</h2>
+
+        <!-- Form for Adding QA Entry -->
+        <form id="addQaForm" method="POST" action="{{ url_for('add_qa_entry') }}">
+            <label for="question">Question:</label>
+            <input type="text" id="question" name="question" required>
+
+            <label for="answer">Answer:</label>
+            <textarea id="answer" name="answer" required></textarea>
+
+            <button type="submit">Add QA Entry</button>
+        </form>
+
+        <hr>
+
+        <!-- List of Existing QA Entries with Edit and Delete options -->
+        <ul>
+            {% for entry in qa_entries %}
+                <li>
+                    <strong>Question:</strong> {{ entry.question }}<br>
+                    <strong>Answer:</strong> {{ entry.answer }}<br>
+                    <a href="{{ url_for('edit_qa_entry', id=entry.id) }}">Edit</a> |
+                    <a href="{{ url_for('delete_qa_entry', id=entry.id) }}">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
