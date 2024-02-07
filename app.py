@@ -16,6 +16,7 @@ class QAEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.String(255), nullable=False)
     answer = db.Column(db.String(255), nullable=False)
+    tag = db.Column(db.String(50))  # Add new field for tag
 
 @app.route('/login')
 def login():
@@ -39,39 +40,42 @@ def add_qa_entry():
     if request.method == 'POST':
         question = request.form['question']
         answer = request.form['answer']
+        tag = request.form['tag']  # Get tag from form
         
-        new_entry = QAEntry(question=question, answer=answer)
+        new_entry = QAEntry(question=question, answer=answer, tag=tag)
         db.session.add(new_entry)
         db.session.commit()
         
     return redirect(url_for('qa_entry_management'))
 
-# Example route to edit a QA entry
-@app.route('/edit_qa_entry/<int:id>', methods=['GET', 'POST'])
-def edit_qa_entry(id):
-    entry = QAEntry.query.get(id)
+@app.route('/qa_entries', methods=['GET'])
+def get_qa_entries():
+    qa_entries = QAEntry.query.all()
+    return render_template('qa_entries.html', qa_entries=qa_entries)
 
+# Example route to edit a QA entry
+@app.route('/edit_qa_entry/<int:qa_entry_id>', methods=['GET', 'POST'])
+def edit_qa_entry(qa_entry_id):
+    qa_entry = QAEntry.query.get_or_404(qa_entry_id)
     if request.method == 'POST':
-        entry.question = request.form['question']
-        entry.answer = request.form['answer']
+        qa_entry.question = request.form['question']
+        qa_entry.answer = request.form['answer']
+        qa_entry.tag = request.form['tag']
         db.session.commit()
-        
-        return redirect(url_for('qa_entry_management'))
-    
-    return render_template('edit_qa_entry.html', entry=entry)
+        return redirect(url_for('get_qa_entries'))
+    return render_template('edit_qa_entry.html', qa_entry=qa_entry)
 
 # Example route to delete a QA entry
-@app.route('/delete_qa_entry/<int:id>')
-def delete_qa_entry(id):
-    entry = QAEntry.query.get(id)
-    db.session.delete(entry)
+@app.route('/delete_qa_entry/<int:qa_entry_id>', methods=['POST'])
+def delete_qa_entry(qa_entry_id):
+    qa_entry = QAEntry.query.get_or_404(qa_entry_id)
+    db.session.delete(qa_entry)
     db.session.commit()
-    
-    return redirect(url_for('qa_entry_management'))
+    return redirect(url_for('get_qa_entries'))
+
 
     if __name__ == '__main__':
         app.run(debug=True)
-
 
 if __name__=="__main__":
     app.run(host=os.getenv('IP', '0.0.0.0'), 
