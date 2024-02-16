@@ -93,6 +93,8 @@
                     <th>Question</th>
                     <th>Answer</th>
                     <th>Tag</th>
+                    <th>Date Created</th>  <!-- New column for date and time -->
+                    <th>Time Created</th>  <!-- New column for date and time -->
                     <th>Actions</th> <!-- New column for edit and delete buttons -->
                 </tr>
             </thead>
@@ -102,6 +104,8 @@
                     <td>{{ qa_entry.question }}</td>
                     <td>{{ qa_entry.answer }}</td>
                     <td>{{ qa_entry.tag }}</td>
+                    <td>{{ qa_entry.date.strftime('%Y-%m-%d') }}</td> <!-- Display date -->
+                    <td>{{ qa_entry.time.strftime('%H:%M:%S') }}</td> <!-- Display time -->
                     <td>
                         <a href="{{ url_for('edit_qa_entry', qa_entry_id=qa_entry.id) }}" class="pagination-btn edit-btn">
                             <i class="fas fa-edit"></i> Edit
