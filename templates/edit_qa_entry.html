@@ -1,4 +1,4 @@
-<!-- edit_qa_entry.html -->
+<!-- edit_qa_entry.html
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,5 +22,98 @@
         <button type="submit">Update</button>
     </form>
 </body>
-</html>
+</html> -->
 
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit QA Entry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('/static/image.jpeg'); /* Specify the URL of the background image */
+            background-size: cover;
+            background-position: center top 0.1px; /* Center the background image horizontally and set vertical position to 50px from the top */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.8); /* Add opacity to the container background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit QA Entry</h1>
+        <form action="{{ url_for('edit_qa_entry', qa_entry_id=qa_entry.id) }}" method="post" onsubmit="return confirm('Are you sure you want to edit this entry?');" style="display: inline;">
+            <!-- Your form inputs -->
+            <label for="question">Question:</label>
+            <input type="text" id="question" name="question" value="{{ qa_entry.question }}" required>
+
+            <label for="answer">Answer:</label>
+            <textarea id="answer" name="answer" required>{{ qa_entry.answer }}</textarea>
+
+            <label for="tag">Tag:</label>
+            <input type="text" id="tag" name="tag" value="{{ qa_entry.tag }}">
+
+            <button type="submit">Update QA Entry</button>
+        </form>
+    </div>
+</body>
+</html>

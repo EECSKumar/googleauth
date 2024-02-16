@@ -1,13 +1,123 @@
-<!-- templates/qa_entry_management.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Add your meta tags, title, and stylesheet link here -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Console</title> <!-- Changed title to "Manager Console" -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Link to your stylesheet -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('/static/image.jpeg'); /* Specify the URL of the background image */
+            background-size: cover;
+            background-position: center top 0.1px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .qa-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.8); /* Add a semi-transparent background color for better readability */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background-color: #f2f2f2;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff; /* Changed text color to white */
+            margin-left: 10px;
+            background-color: #4CAF50; /* Added background color */
+            padding: 10px; /* Added padding */
+            border-radius: 4px; /* Added border-radius */
+        }
+
+        a:hover {
+            background-color: #45a049; /* Change background color on hover */
+        }
+
+        hr {
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="qa-container">
-        <h2>QA Entry Management</h2>
+        <!-- <h2>Manager Console</h2> Changed heading to "Manager Console" -->
+        <h1 class="fade-in-element">Manager Console</h1>
+        <ul class="qa-list">
+            {% for qa_entry in qa_entries %}
+                <li class="slide-in-left-element">
+                    <h3>{{ qa_entry.question }}</h3>
+                    <p>{{ qa_entry.answer }}</p>
+                    <p>Tag: {{ qa_entry.tag }}</p>
+                    <a href="{{ url_for('edit_qa_entry', qa_entry_id=qa_entry.id) }}" class="hover-effect"><i class="fas fa-edit"></i></a>
+                    <form action="{{ url_for('delete_qa_entry', qa_entry_id=qa_entry.id) }}" method="post" style="display: inline;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="button"><i class="fas fa-trash-alt"></i></button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+        <!-- Upload CSV form -->
+        <!-- <form action="/upload_csv" method="post" enctype="multipart/form-data">
+            <input type="file" name="csv_file" accept=".csv">
+            <button type="submit">Upload CSV</button>
+        </form> -->
+        
+        <!-- Download CSV link -->
+        <!-- <a href="/download_csv">Download CSV</a> -->
 
         <!-- Form for Adding QA Entry -->
         <form id="addQaForm" method="POST" action="{{ url_for('add_qa_entry') }}">
@@ -17,25 +127,23 @@
             <label for="answer">Answer:</label>
             <textarea id="answer" name="answer" required></textarea>
 
-            <label for="tag">Tag:</label>  <!-- Add input field for tag -->
+            <label for="tag">Tag:</label> <!-- Add input field for tag -->
             <input type="text" id="tag" name="tag">
 
             <button type="submit">Add QA Entry</button>
         </form>
-
-
 
         <hr>
 
         <!-- List of Existing QA Entries with Edit and Delete options -->
         <ul>
             {% for entry in qa_entries %}
-                <li>
-                    <strong>Question:</strong> {{ entry.question }}<br>
-                    <strong>Answer:</strong> {{ entry.answer }}<br>
-                    <a href="{{ url_for('edit_qa_entry', id=entry.id) }}">Edit</a> |
-                    <a href="{{ url_for('delete_qa_entry', id=entry.id) }}">Delete</a>
-                </li>
+            <li>
+                <strong>Question:</strong> {{ entry.question }}<br>
+                <strong>Answer:</strong> {{ entry.answer }}<br>
+                <a href="{{ url_for('edit_qa_entry', id=entry.id) }}">Edit</a> |
+                <a href="{{ url_for('delete_qa_entry', id=entry.id) }}">Delete</a>
+            </li>
             {% endfor %}
         </ul>
     </div>

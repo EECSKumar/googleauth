@@ -2,68 +2,103 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    background-image: url('path/to/image.jpeg'); /* Replace 'path/to/background_image.jpg' with the actual path to your background image */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     margin: 0;
     padding: 0;
 }
 
 .container {
     max-width: 800px;
-    margin: 20px auto;
+    margin: 50px auto; /* Adjust margin for better alignment */
     padding: 20px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.8); /* Add transparency to the background color */
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
     color: #333;
+    text-align: center; /* Center align the heading */
 }
 
-.qa-list {
-    list-style-type: none;
-    padding: 0;
+form {
+    margin-bottom: 20px;
 }
 
-.qa-list li {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
+label {
+    display: block;
+    margin-bottom: 5px;
 }
 
-/* Hover effect for links */
-a:hover {
-    color: #ff6600; /* Change color on hover */
+input,
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
-/* Transition for button hover effect */
 button {
     background-color: #007bff;
     color: #fff;
+    padding: 10px;
     border: none;
-    padding: 10px 20px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth background color transition */
 }
 
 button:hover {
-    background-color: #0056b3; /* Change background color on hover */
+    background-color: #0056b3;
 }
 
-/* Animation for bouncing effect */
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0); /* Initial and final state */
-    }
-    40% {
-        transform: translateY(-20px); /* Bounce up */
-    }
-    60% {
-        transform: translateY(-10px); /* Bounce down */
-    }
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    background-color: #f2f2f2;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+    margin-left: 10px;
+}
+
+hr {
+    border: 1px solid #ddd;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.edit-btn,
+.delete-btn {
+    background-color: transparent;
+    color: #777;
+    border: none;
+    padding: 5px 8px; /* Adjust padding */
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+    color: #333;
+    text-decoration: none;
+}
+
+.edit-btn {
+    margin-right: 5px; /* Add margin between the buttons */
 }
 
 
-/* Apply animation to element */
-.bouncing-element {
-    animation: bounce 1s infinite; /* Apply bounce animation infinitely */
-}
+

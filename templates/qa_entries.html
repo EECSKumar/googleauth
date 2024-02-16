@@ -1,31 +1,144 @@
-<!-- qa_entries.html -->
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QA Entries</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('/static/image.jpeg');
+            background-size: cover;
+            background-position: center top 0.1px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .qa-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Style for the previous and next buttons */
+        .pagination-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 0 5px; /* Add some margin between buttons */
+        }
+
+        .pagination-btn:hover {
+            background-color: #45a049;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Add the CSS styles for edit and delete buttons */
+        .edit-btn,
+        .delete-btn {
+            background-color: transparent;
+            color: #777;
+            border: none;
+            padding: 5px 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            margin-right: 5px; /* Add margin between the buttons */
+        }
+
+        .edit-btn:hover,
+        .delete-btn:hover,
+        .pagination-btn.prev:hover,
+        .pagination-btn.next:hover {
+            color: #333;
+            text-decoration: none;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
+    <div class="qa-container">
         <h1 class="fade-in-element">QA Entries</h1>
-        <ul class="qa-list">
-            {% for qa_entry in qa_entries %}
-                <li class="slide-in-left-element">
-                    <h3>{{ qa_entry.question }}</h3>
-                    <p>{{ qa_entry.answer }}</p>
-                    <p>Tag: {{ qa_entry.tag }}</p>
-                    <a href="{{ url_for('edit_qa_entry', qa_entry_id=qa_entry.id) }}" class="hover-effect"><i class="fas fa-edit"></i></a>
-                    <form action="{{ url_for('delete_qa_entry', qa_entry_id=qa_entry.id) }}" method="post" style="display: inline;">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" class="button"><i class="fas fa-trash-alt"></i></button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
+        <table id="qaTable" class="display">
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Answer</th>
+                    <th>Tag</th>
+                    <th>Actions</th> <!-- New column for edit and delete buttons -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for qa_entry in qa_entries %}
+                <tr>
+                    <td>{{ qa_entry.question }}</td>
+                    <td>{{ qa_entry.answer }}</td>
+                    <td>{{ qa_entry.tag }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_qa_entry', qa_entry_id=qa_entry.id) }}" class="pagination-btn edit-btn">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form action="{{ url_for('delete_qa_entry', qa_entry_id=qa_entry.id) }}" method="post"
+                            onsubmit="return confirm('Are you sure you want to delete this entry?');" style="display: inline;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="pagination-btn delete-btn"><i class="fas fa-trash-alt"></i> Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+
+    <!-- Include necessary JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#qaTable').DataTable();
+
+            // Previous button functionality
+            $('#prevBtn').on('click', function () {
+                $('#qaTable').DataTable().page('previous').draw('page');
+            });
+
+            // Next button functionality
+            $('#nextBtn').on('click', function () {
+                $('#qaTable').DataTable().page('next').draw('page');
+            });
+        });
+    </script>
 </body>
+
 </html>
+
+
+
