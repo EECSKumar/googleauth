@@ -68,17 +68,6 @@ def get_qa_entries():
     qa_entries = QAEntry.query.all()
     return render_template('qa_entries.html', qa_entries=qa_entries)
 
-# @app.route('/get_qa_entries')
-# def get_qa_entries():
-#     qa_entries = QAEntry.query.all()
-#     qa_entries_data = [{
-#         'id': entry.id,
-#         'question': entry.question,
-#         'answer': entry.answer,
-#         'tag': entry.tag
-#     } for entry in qa_entries]
-#     return jsonify(qa_entries_data)
-
 
 # Example route to edit a QA entry
 @app.route('/edit_qa_entry/<int:qa_entry_id>', methods=['GET', 'POST'])
