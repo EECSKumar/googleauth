@@ -90,6 +90,20 @@
             margin-top: 20px;
             margin-bottom: 20px;
         }
+
+        /* Style for file upload form */
+        #uploadForm {
+            margin-top: 20px;
+        }
+
+        #uploadForm label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #uploadForm input[type="file"] {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -100,7 +114,7 @@
                 <li class="slide-in-left-element">
                     <h3>{{ qa_entry.question }}</h3>
                     <p>{{ qa_entry.answer }}</p>
-                    <p>Tag: {{ qa_entry.tag }}</p>
+                    <p>Tags: {% for tag in qa_entry.tags %}{{ tag }}, {% endfor %}</p> <!-- Display multiple tags -->
                     <a href="{{ url_for('edit_qa_entry', qa_entry_id=qa_entry.id) }}" class="hover-effect"><i class="fas fa-edit"></i></a>
                     <form action="{{ url_for('delete_qa_entry', qa_entry_id=qa_entry.id) }}" method="post" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE">
@@ -110,7 +124,6 @@
             {% endfor %}
         </ul>
 
-
         <!-- Form for Adding QA Entry -->
         <form id="addQaForm" method="POST" action="{{ url_for('add_qa_entry') }}">
             <label for="question">Question:</label>
@@ -119,8 +132,8 @@
             <label for="answer">Answer:</label>
             <textarea id="answer" name="answer" required></textarea>
 
-            <label for="tag">Tag:</label> <!-- Add input field for tag -->
-            <input type="text" id="tag" name="tag">
+            <label for="tags">Tags:</label>
+            <input type="text" id="tags" name="tags" placeholder="Enter tags separated by commas">
 
             <button type="submit">Add QA Entry</button>
         </form>
@@ -133,11 +146,20 @@
             <li>
                 <strong>Question:</strong> {{ entry.question }}<br>
                 <strong>Answer:</strong> {{ entry.answer }}<br>
+                <strong>Tags:</strong> {% for tag in entry.tags %}{{ tag }}, {% endfor %}<br> <!-- Display multiple tags -->
                 <a href="{{ url_for('edit_qa_entry', id=entry.id) }}">Edit</a> |
                 <a href="{{ url_for('delete_qa_entry', id=entry.id) }}">Delete</a>
             </li>
             {% endfor %}
         </ul>
+
+        <!-- File upload form -->
+        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">
+            <label for="file">Upload CSV or TXT file:</label>
+            <input type="file" id="file" name="files" accept=".csv, .txt" required multiple>
+            <button type="submit">Upload</button>
+        </form>
+
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
