@@ -3,13 +3,24 @@
 import os
 import csv  # Add this import statement
 from io import StringIO  # Add this import statement
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_file, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 
+import json 
+import jwt
+
+from authlib.integrations.flask_client import OAuth
+
+appConf = {
+    "OAUTH2_CLIENT_ID": "45414454636-tq1nn00fj4s5p146sqvqulucudaep9ms.apps.googleusercontent.com",
+    "OAUTH2_CLIENT_SECRET": "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",
+    "FLASK_SECRET": "Hkamma",
+    "OAUTH_META_URL": "https://accounts.google.com/.well-known/openid-configuration",
+}
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:password@localhost/development'
@@ -17,33 +28,41 @@ app.config['SECRET_KEY'] = 'mysecretkey'  # Set a secret key for sessions
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
+app.secret_key = appConf.get("FLASK_SECRET")
+oauth = OAuth(app)
 
-# Define User model
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(100), nullable=False)
+oauth.register(
+    name="myApp",
+    client_id=appConf.get("OAUTH2_CLIENT_ID"),
+    client_secret=appConf.get("OAUTH2_CLIENT_SECRET"),
+    server_metadata_url=appConf.get("OAUTH_META_URL"),
+    client_kwargs={"scope": "openid profile email"},
+               )
 
-    # Implement UserMixin methods
-    def is_active(self):
-        return True
 
-    def is_authenticated(self):
-        return True
+# # Define User model
+# class User(UserMixin, db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(50), unique=True, nullable=False)
+#     email = db.Column(db.String(100), unique=True, nullable=False)
+#     password_hash = db.Column(db.String(300), nullable=False)
 
-    def is_anonymous(self):
-        return False
+#     # Implement UserMixin methods
+#     def is_active(self):
+#         return True
 
-    def get_id(self):
-        return str(self.id)
+#     def is_authenticated(self):
+#         return True
 
-@login_manager.user_loader
-def load_user(user_id):
-    return db.session.query(User).get(int(user_id))
+#     def is_anonymous(self):
+#         return False
+
+#     def get_id(self):
+#         return str(self.id)
+
+# @login_manager.user_loader
+# def load_user(user_id):
+#     return db.session.query(User).get(int(user_id))
 
 
 # File upload logic
@@ -161,48 +180,110 @@ def upload_file():
 
 
 # Login route
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login')
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password_hash, password):
-            login_user(user)
-            return redirect(url_for('get_qa_entries'))
-        else:
-            flash('Invalid username or password.', 'error')
-    return render_template('login.html')
+    jwt_payload = session.get("user")
+    print(jwt_payload)
 
-# Registration route
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            flash('Username already exists.', 'error')
-        else:
-            hashed_password = generate_password_hash(password)
-            new_user = User(username=username, email=email, password_hash=hashed_password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Registration successful. You can now login.', 'success')
-            return redirect(url_for('login'))
-    return render_template('register.html')
 
-# Logout route
+    # Pass the JWT payload to the template
+    return render_template('login.html', pretty=json.dumps(jwt_payload, indent=4))
+
+    # if request.method == 'POST':
+    #     username = request.form['username']
+    #     password = request.form['password']
+    #     user = User.query.filter_by(username=username).first()
+    #     if user and check_password_hash(user.password_hash, password):
+    #         login_user(user)
+    #         return redirect(url_for('get_qa_entries'))
+    #     else:
+    #         flash('Invalid username or password.', 'error')
+    # return render_template('login.html')
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(255), nullable=False)
+#     username = db.Column(db.String(50), unique=True, nullable=False)
+#     email = db.Column(db.String(100), unique=True, nullable=False)
+#     password_hash = db.Column(db.String(300), nullable=False)em
+
+@app.route('/google-login')
+def googleLogin():
+    print("google login")
+    return oauth.myApp.authorize_redirect(redirect_uri=url_for("googleCallback", _external=True))
+
+
+@app.route('/signin-google')
+def googleCallback():
+    token = oauth.myApp.authorize_access_token()
+    user_info_response = oauth.myApp.get("https://www.googleapis.com/oauth2/v2/userinfo")
+    user_info = user_info_response.json()
+
+    email = user_info.get("email")
+    print(email)
+    user = User.query.filter_by(email=email).first()
+    print(session)
+    
+    if user:
+        # Email exists in the database, proceed with login
+        session["user"] = "loggin"
+        return redirect(url_for("get_qa_entries"))
+    else:
+        # Email does not exist in the database, redirect to registration page or display error message
+        return render_template("email_not_found.html")
+# # Registration route
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         email = request.form['email']
+#         password = request.form['password']
+#         existing_user = User.query.filter_by(username=username).first()
+#         if existing_user:
+#             flash('Username already exists.', 'error')
+#         else:
+#             hashed_password = generate_password_hash(password)
+#             new_user = User(username=username, email=email, password_hash=hashed_password)
+#             db.session.add(new_user)
+#             db.session.commit()
+#             flash('Registration successful. You can now login.', 'success')
+#             return redirect(url_for('login'))
+#     return render_template('register.html')
+
+# # Logout route
+# @app.route('/logout')
+# @login_required
+# def logout():
+#     logout_user()
+#     return redirect(url_for('login'))
+
 @app.route('/logout')
-@login_required
 def logout():
-    logout_user()
-    return redirect(url_for('login'))
+    print(session)
+    session['user'] = "logged out"
+    print(session)
+    return redirect(url_for("login"))
+
+
+@app.route('/user_entry')
+def user_entry():
+    return render_template('users.html')
+
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    if request.method == 'POST':
+        email = request.form['email']
+        role = request.form['role']
+        
+        new_entry = User(email=email, role = role)
+        db.session.add(new_entry)
+        db.session.commit()
+        
+    return redirect(url_for('user_entry'))
 
 # Protected route for QA entry management
 @app.route('/qa_entry_management')
-@login_required
 def qa_entry_management():
     return render_template('qa_entry_management.html')
 
@@ -228,7 +309,6 @@ class QAEntry(db.Model):
 
 # Example route to add a QA entry
 @app.route('/add_qa_entry', methods=['POST'])
-@login_required
 def add_qa_entry():
     if request.method == 'POST':
         question = request.form['question']
@@ -242,7 +322,6 @@ def add_qa_entry():
 
 # Example route to edit a QA entry
 @app.route('/edit_qa_entry/<int:qa_entry_id>', methods=['GET', 'POST'])
-@login_required
 def edit_qa_entry(qa_entry_id):
     qa_entry = QAEntry.query.get_or_404(qa_entry_id)
     if request.method == 'POST':
@@ -257,7 +336,6 @@ def edit_qa_entry(qa_entry_id):
 
 # Example route to delete a QA entry
 @app.route('/delete_qa_entry/<int:qa_entry_id>', methods=['POST'])
-@login_required
 def delete_qa_entry(qa_entry_id):
     qa_entry = QAEntry.query.get_or_404(qa_entry_id)
     db.session.delete(qa_entry)
@@ -266,10 +344,13 @@ def delete_qa_entry(qa_entry_id):
 
 # Route to display QA entries
 @app.route('/qa_entries', methods=['GET'])
-@login_required
 def get_qa_entries():
-    qa_entries = QAEntry.query.all()
-    return render_template('qa_entries.html', qa_entries=qa_entries)
+    print(session['user'])
+    if session['user'] == 'loggin':
+        qa_entries = QAEntry.query.all()
+        return render_template('qa_entries.html', qa_entries=qa_entries)
+    else:
+        return redirect(url_for('login'))
 
 
 if __name__ == "__main__":

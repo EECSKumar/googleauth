@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Console</title> <!-- Changed title to "Manager Console" -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Link to your stylesheet -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('/static/image.jpeg'); /* Specify the URL of the background image */
+            background-size: cover;
+            background-position: center top 0.1px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .qa-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.8); /* Add a semi-transparent background color for better readability */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background-color: #f2f2f2;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff; /* Changed text color to white */
+            margin-left: 10px;
+            background-color: #4CAF50; /* Added background color */
+            padding: 10px; /* Added padding */
+            border-radius: 4px; /* Added border-radius */
+        }
+
+        a:hover {
+            background-color: #45a049; /* Change background color on hover */
+        }
+
+        hr {
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        #add_user{
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="qa-container">
+        <!-- <h2>Manager Console</h2> Changed heading to "Manager Console" -->
+        <h1 class="fade-in-element">Add users</h1>
+        <form id="addQaForm" method="POST" action="{{ url_for('add_user') }}">
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
+
+            <label for="role">Choose the user type:</label>
+            <select id="role" name="role">
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+            </select>
+            <br>
+            <button id="add_user" type="submit">Add User</button>
+        </form>
+
+        <hr>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
