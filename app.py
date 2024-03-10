@@ -221,9 +221,7 @@ def googleCallback():
     user_info = user_info_response.json()
 
     email = user_info.get("email")
-    print(email)
     user = User.query.filter_by(email=email).first()
-    print(session)
     
     if user:
         # Email exists in the database, proceed with login
